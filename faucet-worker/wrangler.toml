@@ -1,0 +1,33 @@
+name = "team1vn-faucet"
+main = "src/index.ts"
+compatibility_date = "2026-01-15"
+# ❓ Vì sao cần nodejs_compat?
+# → viem dùng vài API kiểu Node (Buffer, crypto) khi ký giao dịch. Cờ này bật lớp tương thích
+#   của Workers, không có nó thì Worker crash ngay lúc import viem.
+compatibility_flags = ["nodejs_compat"]
+
+# ❓ KV dùng làm gì?
+# → Lưu dấu "địa chỉ này / IP này đã nhận rồi" kèm TTL = đúng thời gian cooldown.
+#   Hết TTL Cloudflare tự xoá key → khỏi phải dọn dẹp thủ công.
+# ⚠️ Tạo namespace rồi dán id vào đây:
+#     npx wrangler kv namespace create FAUCET_KV
+[[kv_namespaces]]
+binding = "FAUCET_KV"
+id = "PASTE_KV_NAMESPACE_ID_HERE"
+
+[vars]
+# Số AVAX phát mỗi lượt. Đo thực tế trên Fuji (gas 1 nAVAX):
+#   deploy AvaxCats = 0.001236 AVAX · mỗi lần mint ≈ 0.00025 AVAX
+# 0.005 đủ deploy + hơn 10 lần mint, và vẫn để ví 5 AVAX phục vụ được ~1000 lượt.
+# ⚠️ Đừng để dưới 0.0015 — học viên sẽ không deploy nổi contract ở bước 1.
+DRIP_AMOUNT = "0.005"
+COOLDOWN_HOURS = "24"
+ALLOWED_ORIGINS = "https://team1vn.xyz,https://www.team1vn.xyz,http://localhost:3000"
+RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
+
+# Secrets — KHÔNG đặt ở đây, nạp bằng lệnh (giá trị không bao giờ vào git):
+#   npx wrangler secret put FAUCET_PRIVATE_KEY     (bắt buộc — ví nóng đã nạp AVAX test)
+#   npx wrangler secret put TURNSTILE_SECRET       (tuỳ chọn — bật captcha chống bot)
+
+[observability]
+enabled = true

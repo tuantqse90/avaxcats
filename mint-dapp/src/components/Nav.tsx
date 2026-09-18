@@ -1,15 +1,18 @@
-import { CHAIN_LABEL, EXPLORER, FAUCET } from "@/lib/chains";
+import { CHAIN_LABEL, EXPLORER } from "@/lib/chains";
 import { ACADEMY, BUILDER_HUB, CONSOLE, CREATE_L1, DOCS, GITHUB } from "@/lib/links";
+import { FaucetButton } from "./FaucetButton";
 import { Logo } from "./Logo";
 import { Icon } from "./ui";
 
+// ❓ Vì sao bỏ "Faucet" khỏi danh sách link này?
+// → Faucet giờ là nút CTA cạnh "Create L1" (bấm phát nhận AVAX test luôn), để lại link cũ trong menu
+//   là trùng lặp. Khi chưa cấu hình faucet riêng thì chính nút CTA đó quay về link Builder Hub.
 const LINKS: { label: string; href: string; internal?: boolean }[] = [
   { label: "Demo", href: "/demo.html", internal: true },
   { label: "Builder Hub", href: BUILDER_HUB },
   { label: "Academy", href: ACADEMY },
   { label: "Docs", href: DOCS },
   { label: "Console", href: CONSOLE },
-  { label: "Faucet", href: FAUCET },
   ...(EXPLORER ? [{ label: "Snowtrace", href: EXPLORER }] : []),
   { label: "GitHub", href: GITHUB },
 ];
@@ -48,6 +51,7 @@ export function Nav() {
         <span className="eyebrow hidden border border-line px-2.5 py-1.5 text-muted lg:inline-block">
           {CHAIN_LABEL}
         </span>
+        <FaucetButton />
         <a
           href={CREATE_L1}
           target="_blank"
@@ -79,6 +83,7 @@ export function Nav() {
               Create your own L1
               <Icon name="external" className="size-3.5 text-muted" />
             </a>
+            <FaucetButton variant="menu" />
             {LINKS.map((l) => (
               <a
                 key={l.label}
