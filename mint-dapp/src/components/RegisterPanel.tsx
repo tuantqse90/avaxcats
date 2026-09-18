@@ -24,20 +24,6 @@ import {
   type KpiPayload,
 } from "@/lib/kpi";
 
-// ❓ Vì sao phải "chuẩn hoá" handle Telegram?
-// → Sinh viên nhập đủ kiểu: @abc, t.me/abc, https://t.me/abc… Bóc hết prefix rồi luôn trả về dạng "@abc" để cột trong
-//   Google Sheet đồng nhất. Chuỗi rỗng → "" (không phải "@") vì trường này giờ là tuỳ chọn.
-function normalizeTelegram(v: string) {
-  const t = v
-    .trim()
-    .replace(/^https?:\/\//i, "")
-    .replace(/^t\.me\//i, "")
-    .replace(/^telegram\.me\//i, "")
-    .replace(/^@/, "")
-    .trim();
-  return t ? "@" + t : "";
-}
-
 // ❓ Dòng replace(/[/?].*$/, "") để làm gì?
 // → Link X thường có đuôi: x.com/abc?s=20 hoặc x.com/abc/status/123. Cắt từ dấu "/" hoặc "?" đầu tiên để chỉ giữ handle.
 function normalizeX(v: string) {
@@ -91,7 +77,6 @@ export function RegisterPanel() {
 
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
-  const [telegram, setTelegram] = useState("");
   const [x, setX] = useState("");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -106,7 +91,7 @@ export function RegisterPanel() {
   const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.trim());
   // ❓ Điều kiện để bấm Submit?
   // → Ví đã kết nối (để có wallet address), có tên, email hợp lệ, và không đang gửi (chặn double-submit).
-  //   Telegram/X là tuỳ chọn — không bắt buộc phải điền.
+  //   X là tuỳ chọn — không bắt buộc phải điền.
   const canSend = isConnected && name.trim() !== "" && validEmail && !sending;
 
   async function send() {
@@ -119,7 +104,6 @@ export function RegisterPanel() {
     const payload: KpiPayload = {
       name: name.trim(),
       contact: contact.trim(),
-      telegram: normalizeTelegram(telegram),
       x: normalizeX(x),
       wallet: wallet ?? "",
       contract,
@@ -165,7 +149,6 @@ export function RegisterPanel() {
             {[
               ["Name", done.name],
               ["Gmail (Builder Hub)", done.contact],
-              ["Telegram", done.telegram],
               ["X account", done.x],
               ["Wallet", done.wallet],
               ["Contract", done.contract],
@@ -220,14 +203,6 @@ export function RegisterPanel() {
             />
           </Field>
 
-          <Field label="Telegram" hint="Optional. @handle, t.me/handle or a bare handle all work">
-            <Input
-              value={telegram}
-              onChange={(e) => setTelegram(e.target.value)}
-              placeholder="@yourhandle"
-            />
-          </Field>
-
           <Field label="X (Twitter) account" hint="Optional. @handle or an x.com link">
             <Input
               value={x}
@@ -272,8 +247,8 @@ export function RegisterPanel() {
             </Status>
           )}
           <p className="text-xs leading-5 text-muted">
-            Sends: name · Gmail (Builder Hub) · Telegram · X account · wallet address ·
-            contract address · network · NFTs minted ({minted}).
+            Sends: name · Gmail (Builder Hub) · X account · wallet address · contract
+            address · network · NFTs minted ({minted}).
           </p>
           {isConfigured && explorerAddress(contract) && (
             <a
