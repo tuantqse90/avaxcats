@@ -5,6 +5,8 @@ import { useAccount, useReadContract } from "wagmi";
 import { activeChain, CHAIN_LABEL } from "@/lib/chains";
 import { AVAXCATS_ABI, explorerAddress } from "@/lib/contract";
 import { useContractAddress } from "@/lib/deployed";
+import { type GoogleIdentity } from "@/lib/google";
+import { GoogleSignIn } from "./GoogleSignIn";
 import {
   Button,
   Card,
@@ -81,6 +83,13 @@ export function RegisterPanel() {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const [google, setGoogle] = useState<GoogleIdentity | null>(null);
+
+  // ❓ Vì sao email đã đăng nhập Google rồi mà vẫn cho sửa tay?
+  // → Có người đăng nhập Builder Hub bằng GitHub hoặc email OTP, Google account của họ là địa chỉ khác.
+  //   Cho sửa, nhưng sửa lệch đi thì bỏ luôn dấu "đã xác minh" — không được để token của email này
+  //   đi kèm một email khác.
+  const verified = google !== null && google.email === contact.trim();
 
   // ❓ Sao lại Number(balance ?? 0n)?
   // → balance là bigint (uint256); JSON.stringify không serialize được bigint nên phải đổi sang number trước khi gửi.
@@ -104,6 +113,10 @@ export function RegisterPanel() {
     const payload: KpiPayload = {
       name: name.trim(),
       contact: contact.trim(),
+      // ❓ Gửi cả JWT gốc lên làm gì?
+      // → Để server verify được chữ ký của Google rồi mới tin email. Chỉ gửi khi email trên form vẫn
+      //   đúng email trong token; sửa tay lệch đi thì gửi "" cho khỏi gây hiểu nhầm là đã xác minh.
+      idToken: verified && google ? google.credential : "",
       x: normalizeX(x),
       wallet: wallet ?? "",
       contract,
@@ -185,8 +198,24 @@ export function RegisterPanel() {
       />
 
       <Card className="p-5 md:p-6">
+        <GoogleSignIn
+          onIdentity={(id) => {
+            setGoogle(id);
+            setContact(id.email);
+            // Chỉ điền tên khi ô còn trống — đừng đè lên thứ người ta đã tự gõ.
+            setName((prev) => (prev.trim() === "" ? id.name : prev));
+          }}
+        />
+
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Gmail · required" hint="The Gmail you registered on Builder Hub">
+          <Field
+            label="Gmail · required"
+            hint={
+              verified
+                ? "✓ Đã xác minh qua Google"
+                : "The Gmail you registered on Builder Hub"
+            }
+          >
             <Input
               type="email"
               value={contact}

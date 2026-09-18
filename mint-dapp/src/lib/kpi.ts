@@ -12,6 +12,7 @@ export const hasKpiEndpoint = /^https?:\/\//.test(KPI_ENDPOINT);
 export type KpiPayload = {
   name: string;
   contact: string; // Gmail (registered on Builder Hub)
+  idToken: string; // JWT Google, rỗng nếu gõ tay — server verify rồi mới tin email
   x: string; // Account X (Twitter)
   wallet: string;
   contract: string;
