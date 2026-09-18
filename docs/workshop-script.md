@@ -8,7 +8,7 @@ Dòng `>` dưới mỗi ý là câu nói mẫu, đọc nguyên văn được; ý
 - Kịch bản mint. Site đang để mỗi người tự deploy contract riêng. Nếu muốn cả lớp mint chung 48 con như slide 15 ghi, deploy một contract trước, chạy `npm run set-contract 0x…`, build và deploy lại site.
 - Repo `github.com/tuantqse90/avaxcats` đã public, khớp với slide 13 và 18.
 - Slide 18 ghi faucet cũ `faucet.avax.network`. Faucet hiện tại: `build.avax.network/console/primary-network/faucet`.
-- Link Builder Hub trên slide và QR dùng link có ref của Team1: `https://build.avax.network/?ref=DSVUW&utm_source=team1`.
+- Link Builder Hub trên slide và QR dùng link có ref của Team1: `https://go.team1.network/vietnam-builder`.
 - Dự phòng: `team1vn.xyz/demo.html` có 4 clip (đăng nhập Builder Hub, faucet, deploy & mint, tạo L1). Chiếu khi mạng hoặc ví trục trặc.
 - Tạo L1 (slide 16) chạy 8 bước và mất vài phút. Bấm deploy ở đầu phần thực hành slide 15, quay lại xem ở slide 16.
 - Agenda ghi 60 phút, presenter notes ghi 90. Thống nhất một con số.
